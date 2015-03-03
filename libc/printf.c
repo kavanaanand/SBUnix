@@ -20,6 +20,7 @@ int printf(const char *format, ...) {
 
 
 
+<<<<<<< HEAD
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -27,6 +28,13 @@ int printf(const char *format, ...) {
 #define MAXIMUM_SIZE 512
 
 char ptr[MAXIMUM_SIZE];
+=======
+	while(*format) {
+		//write(1, format, 1);
+		++printed;
+		++format;
+	}
+>>>>>>> 2c4f846c4dbb274d424459f7a54164c7fa3ddd87
 
 char *convert(unsigned int inputNumber, int base) {
     int outputNumber[MAXIMUM_SIZE], i = 0, j = 0;
