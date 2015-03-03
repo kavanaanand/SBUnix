@@ -16,16 +16,4 @@ void _start(int stacktop)
 	argc = main(*(p), q , r);
 	exit(argc);
 
-<<<<<<< HEAD
-=======
-int main(int argc, char* argv[], char* envp[]);
-
-void _start(void) {
-	int argc = 1;
-	char* argv[0];
-	char* envp[0];
-	int res;
-	res = main(argc, argv, envp);
-	exit(res);
->>>>>>> 2c4f846c4dbb274d424459f7a54164c7fa3ddd87
 }
