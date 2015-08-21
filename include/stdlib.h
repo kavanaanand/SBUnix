@@ -11,13 +11,7 @@ void exit(int status);
 typedef uint64_t size_t;
 void *malloc(size_t size);
 void free(void *ptr);
-int brk(void *end_data_segment);
-/*struct Node {
-	unsigned long size;
-	int isFree;
-	struct Node *nextNode;
-}; */   //used for malloc and free
-//void * heap_end; //for brk and sbrk
+uint64_t brk(void *end_data_segment);
 
 // processes
 typedef uint32_t pid_t;
@@ -28,6 +22,10 @@ int execve(const char *filename, char *const argv[], char *const envp[]);
 pid_t waitpid(pid_t pid, int *status, int options);
 unsigned int sleep(unsigned int seconds);
 unsigned int alarm(unsigned int seconds);
+
+//ls and kill
+void listPCB();
+void KillPCB();
 
 // paths
 char *getcwd(char *buf, size_t size);
@@ -55,14 +53,15 @@ struct dirent
 	off_t d_off;
 	unsigned short d_reclen;
 	char d_name [NAME_MAX+1];
-	unsigned short d_namelen;
 };
 void *opendir(const char *name);
 struct dirent *readdir(void *dir);
 int closedir(void *dir);
+int getdents(unsigned int fd, struct dirent *dirp, size_t count);
 struct directory
 {
 	int fd;
 	struct dirent dirPtr;
-};//for dir
+};
+
 #endif

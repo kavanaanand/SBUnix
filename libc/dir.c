@@ -1,48 +1,48 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+// #define MAX_BUFFER_SIZE 1024
 struct dirent dirEntry;
-struct  direct
-{
-    long d_ino;
-    off_t d_off;
-    unsigned short d_reclen;
-    char d_name [NAME_MAX+1];
-    uint16_t d_namelen;
-};
 
 void *opendir(const char *name){
-	struct directory *dirPtr;
-	int fileDesc = open(name,O_RDONLY);
+	struct directory *dirPtr=NULL;
+	int fileDesc = open(name,O_DIRECTORY);
 	if(fileDesc == -1)
 		return NULL;
-	else
-		dirPtr->fd = fileDesc;
-	return dirPtr;
+	else{
+		dirPtr = (struct directory *)malloc(sizeof(struct directory));
+		if(dirPtr!=NULL)
+			dirPtr->fd = fileDesc;
+	}
+	return (void *)dirPtr;
 }
+
+struct dirent *readdir(void *dir){
+	struct directory *dirPtr = (struct directory *)dir;
+	if(dirPtr == NULL)
+		return NULL;
+	struct dirent buffer;
+	int bytesRead;
+
+	bytesRead = getdents((unsigned int)dirPtr->fd,(struct dirent *)&buffer,sizeof(struct dirent));
+	if(bytesRead == 0)
+		return NULL;
+	else{
+		dirEntry.d_ino = buffer.d_ino;
+		dirEntry.d_off = buffer.d_off;
+		dirEntry.d_reclen = buffer.d_reclen;
+		strcpy(dirEntry.d_name,buffer.d_name);
+		return &dirEntry;
+	}
+}
+
 int closedir(void *dir){
 	struct directory *dirPtr = (struct directory *)dir;  
 	if(dirPtr != NULL){
 		close(dirPtr->fd);
-		free(dirPtr);
+		//free(dirPtr);
 		return 0;
 	}
-	return -1;}
-
-struct dirent *readdir(void *dir){
-	struct direct dirBuffer;
-	struct directory *dirPtr = (struct directory *)dir;
-
-	while(read(dirPtr->fd, (char *)&dirBuffer, sizeof(dirBuffer)) == sizeof(dirBuffer)){
-           if (dirBuffer.d_ino == 0) 
-               continue;
-           dirEntry.d_ino = dirBuffer.d_ino;
-           strncpy(dirEntry.d_name, dirBuffer.d_name, dirBuffer.d_namelen);
-           dirEntry.d_name[dirBuffer.d_namelen] = '\0';  
-           dirEntry.d_reclen = dirBuffer.d_reclen;
-           dirEntry.d_off = dirBuffer.d_off;
-           return &dirEntry;
-   	}
-    return NULL;
+	return -1;
 }
-

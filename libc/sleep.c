@@ -17,7 +17,7 @@ unsigned int sleep(unsigned int seconds)
         rmtp=&rem_time;
         __asm__ volatile
         (
-        "syscall"
+        "int $0x80;"
         : "=a"(ret)
         : "0"(SYS_nanosleep), "D"(rqtp),"S"(rmtp)
         : "cc", "rcx", "r11", "memory"

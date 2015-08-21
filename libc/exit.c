@@ -5,7 +5,7 @@ void exit(int status)
 {
         __asm__ volatile
         (
-        "syscall"
+        "int $0x80;"
         ://:
         : "a"(SYS_exit), "D"(status)
         : "cc", "rcx", "r11", "memory"

@@ -61,8 +61,8 @@ void setPath(char *path, char* envp[]){
             mystrcat(envp[i],afterPATH);
             // printf("after string:%s-\n",afterPATH);
             // printf("before string:%s-\n",beforePATH);
-            free(afterPATH);
-            free(beforePATH);
+            // free(afterPATH);
+            // free(beforePATH);
         }else
             strcpy(envp[i],path);
 
@@ -146,7 +146,7 @@ char** getPathsAppendedWithCommand(char *command, char *envp[]){
         }else
             continue;
     }
-    printf("path: %s\n", pathvar);
+    // printf("path: %s\n", pathvar);
 
     paths = malloc(sizeof(char *)* NO_OF_PATHS);
 	for (i = 0; i < NO_OF_PATHS; i++){
@@ -178,30 +178,31 @@ char** getPathsAppendedWithCommand(char *command, char *envp[]){
 int execute(char **commands,char* envp[]){
 	char **arguments = NULL;
 	int i=0,q=0,status=0,retval=0;
-	pid_t pid,pid1,pid_parent,pid1_parent;
+	pid_t pid,pid1;//,pid_parent,pid1_parent;
 	char **paths;
 
 	arguments = malloc(sizeof(char *)* NO_OF_ARGUMENTS);
-	for (i = 0; i < NO_OF_ARGUMENTS; i++){
-		arguments[i]= NULL;
-	}
+	//for (i = 0; i < NO_OF_ARGUMENTS; i++){
+	//	arguments[i]= NULL;
+	//}
 
 	getArguments(commands[0],arguments);
-	for (i = 0; arguments[i]; i++){
-       	printf("arg[%d]:%s\n",i,arguments[i]);
-    }
+	// for (i = 0; arguments[i]; i++){
+ //        if(i==0)
+ //       	    printf("arg[%d]:%s\n",i,arguments[i]);
+ //    }
 
 	pid = fork();
 
 	if(pid == 0){
-		printf("Child Process\n");
+		// printf("Child Process\n");
 		q=execve(arguments[0],arguments,envp);
-        printf("q value:%d\n",q);
+ //       printf("q value:%d\n",q);
 		if(q < 0){
 			paths = getPathsAppendedWithCommand(arguments[0],envp);
 			pid1 = fork();
 			if(pid1 == 0){
-				printf("Child Process 1\n");
+//				printf("Child Process 1\n");
 				for(i=0;paths[i];i++){
       		    // printf("%d - %s\n",i,paths[i]);
       		    strcpy(arguments[0],paths[i]);
@@ -213,11 +214,13 @@ int execute(char **commands,char* envp[]){
    			printf("Invalid Command\n");
    			exit(1);
 			}else if(pid1 == -1){
-				printf("fork failed\n");
+//				printf("fork failed\n");
 			}else{
-				printf("Parent Process 1\n");
-				pid1_parent = waitpid(-1,&status,0);
-				printf("status: %d, pid: %d\n",status,pid1_parent);
+//				printf("Parent Process 1\n");
+//				pid1_parent =
+			 waitpid(-1,&status,0);//////////////////////****************************HERE
+           //  printf("here after waitpid");
+//				printf("status: %d, pid: %d\n",status,pid1_parent);
                 for (i = 0;paths[i]; i++){
                     free(paths[i]);
                 }
@@ -230,12 +233,15 @@ int execute(char **commands,char* envp[]){
             }
 	   }
 	}else if(pid == -1){
-		printf("fork failed\n");
+//		printf("fork failed\n");
 	}else{
-		printf("Parent Process\n");
-		pid_parent = waitpid(-1,&status,0);
-		printf("pid: %d\n",pid_parent);
-		printf("status: %d \n",status);
+//		printf("Parent Process\n");
+//		pid_parent = 
+ waitpid(-1,&status,0); /////////////////////////////////////////////HERE
+             // printf("here after waitpid");
+
+//		printf("pid: %d\n",pid_parent);
+//		printf("status: %d \n",status);
         if(status!=0)
             retval = -1;
 	}
@@ -246,34 +252,35 @@ int piping(int pipesCount,char **str[],char* envp[])
 {
     int index=0,status=0,q=0,pipeIndex=0,i=0,retval=0;
     char **paths;
-    pid_t pid,pid_parent,pid1,pid1_parent;
+    pid_t pid,pid1; //pid_parent,,pid1_parent;
     int pipesfd[pipesCount * 2];
     for(i=0; i<pipesCount;i++){
         if(pipe(pipesfd+(i*2))==-1){
-            printf("pipe failed\n");
+            // printf("pipe failed\n");
             exit(1);
         }
     }
 
     while(str[index]!=NULL){
-        printf("%d\n",index);
+        //printf("%d\n",index);
         pid = fork();
         if(pid==0){
-            printf("Child Process\n");
+            // printf("Child Process\n");
             if(pipeIndex!=0){
                 if(pipesfd[pipeIndex-2]!=0){
-                    printf("Input from pipe\n");
+                    // printf("Input from pipe\n");
                     if(dup2(pipesfd[pipeIndex-2],0)==-1){
-                        printf("dup2 failed 1\n");
+                        // printf("dup2 failed 1\n");
                         exit(1);
                     }
                 }
             }
             if(pipesCount > 0 && index<pipesCount){
                 if(pipesfd[pipeIndex+1]!=1){
-                    printf("Output to pipe\n");
+                    // printf("Output to pipe\n");
                     if(dup2(pipesfd[pipeIndex+1],1)==-1){
-                        printf("dup2 failed 2\n");
+                        // printf("dup2 failed 2\n");
+                        // exit(1);
                     }
                 }
             }
@@ -281,12 +288,12 @@ int piping(int pipesCount,char **str[],char* envp[])
                 close(pipesfd[pipeIndex-2]);
             }
             q=execve(str[index][0],str[index],envp);
-            printf("q value:%d\n",q);
+            // printf("q value:%d\n",q);
             if(q==-1){
                 paths = getPathsAppendedWithCommand(str[index][0],envp);
                 pid1 = fork();
                 if(pid1 == 0){
-                printf("Child Process 1\n");
+                // printf("Child Process 1\n");
                 for(i=0;paths[i];i++){
                     // printf("%d - %s\n",i,paths[i]);
                     strcpy(str[index][0],paths[i]);
@@ -297,46 +304,50 @@ int piping(int pipesCount,char **str[],char* envp[])
                 }
                 printf("Invalid Command\n");
                 exit(1);
-            }else if(pid1 == -1){
-                printf("fork failed\n");
-            }else{
-                printf("Parent Process 1\n");
-                pid1_parent = waitpid(-1,&status,0);
-                printf("status: %d, pid: %d\n",status,pid1_parent);
-                for(i = 0;paths[i]; i++){
-                    free(paths[i]);
-                }
-                free(paths);
-                if(status!=0){
-                    printf("ERROR\n");
-                    exit(1);
-                }else
-                    exit(0);
-            }
-        } 
-    }else if(pid == -1){
-        printf("fork failed\n");
-    }else{
-        printf("Parent Process\n");
-        pid_parent = waitpid(-1,&status,0);
-        printf("status: %d, pid: %d\n",status,pid_parent);
-        if(status!=0){
-            retval = -1;
-            break;
-        }else{
-            if(index < pipesCount && pipesCount > 0){
-                close(pipesfd[pipeIndex+1]);
-            }
-            pipeIndex = pipeIndex + 2;
-            index = index + 1;
-        }
-    }
-  } // while end
+                }else if(pid1 == -1){
+                    // printf("fork failed\n");
+                }else{
+                    // printf("Parent Process 1\n");
+                    //pid1_parent =
+                     waitpid(-1,&status,0);////////////////////////////////////////////HERE
+                                 // printf("here after waitpid");
 
-  for(i=0;i<pipesCount*2;i++){
-    close(pipesfd[i]);
-  }
-  return retval;
+                    // printf("status: %d, pid: %d",status,pid1_parent);
+                    for(i = 0;paths[i]; i++){
+                        // free(paths[i]);
+                    }
+                    // free(paths);
+                    if(status!=0){
+                        printf("ERROR\n");
+                        exit(1);
+                    }else
+                        exit(0);
+                }
+            } 
+        }else if(pid == -1){
+            printf("fork failed\n");
+        }else{
+            // printf("Parent Process\n");
+            //pid_parent = 
+            waitpid(-1,&status,0);
+            // printf("status: %d, pid: %d",status,pid_parent);
+            if(status!=0){
+                retval = -1;
+                break;
+            }else{
+                if(index < pipesCount && pipesCount > 0){
+                    close(pipesfd[pipeIndex+1]);
+                }
+                pipeIndex = pipeIndex + 2;
+                index = index + 1;
+            }
+        }
+    } // while end
+
+    for(i=0;i<pipesCount*2;i++){
+        close(pipesfd[i]);
+    }
+    return retval;
 }
 
 
@@ -350,16 +361,28 @@ int main(int argc, char* argv[], char* envp[]){
     int noOfPipes = 0,returnres=0;
     int i=0,j=0,k=0;
 
+    // printf("Entering Shell\n");
+
     ps1Prompt = (char *)malloc(sizeof(char) * PS1PROMPT_LENGTH);
     memset(ps1Prompt, 0, PS1PROMPT_LENGTH);
     strcpy(ps1Prompt, "sbush");
 
-    str = (char *)malloc(sizeof(char) * COMMAND_STRING_LENGTH);
+    
 
-    while(envp[i]){
-        printf("evnp[%d] - %s\n",i,envp[i]);
-        i++;
-    }
+    // while(envp[i]){
+    //     printf("evnp[%d] - %s\n",i,envp[i]);
+    //     i++;
+    // }
+
+    str = (char *)malloc(sizeof(char) * COMMAND_STRING_LENGTH);
+    // strcpy(str,"ls");
+
+
+    // while(1){
+    //     printf("enter command:");
+    //     scanf("%s",str);
+    //     printf("%s\n",str);   
+    // }
 
     while(1){
         memset(str, 0, COMMAND_STRING_LENGTH);
@@ -372,14 +395,14 @@ int main(int argc, char* argv[], char* envp[]){
         	str++;
         }
         str = temp;
-       	printf("str is: %s end\n",str);
+       	// printf("str is:%s:end\n",str);
 
         if(strcmp(str,"exit")==0){
             exit(0);
         }else if(strncmp(str,"cd",2)==0){
             path=malloc(strlen(str)-2);
             strcpy(path,str+3);
-            printf("%s\n",path);
+            // printf("%s\n",path);
             returnres = chdir(path);
             if(returnres==-1)
                 printf("Failed\n");
@@ -422,9 +445,9 @@ int main(int argc, char* argv[], char* envp[]){
                         	allCommands[i][k] = NULL;
                     	getArguments(commands[i],allCommands[i]);
                     }
-                    printf("Calling piping:%d\n",noOfPipes);
+                    // printf("Calling piping:%d\n",noOfPipes);
                 	returnres = piping(noOfPipes,allCommands,envp);
-                	printf("Piping returned:%d\n",returnres);
+                	// printf("Piping returned:%d\n",returnres);
 
                 	for (i = 0; allCommands[i]!=NULL; i++) {
                     	for (j=0; allCommands[i][j]!= NULL; j++){
@@ -448,4 +471,5 @@ int main(int argc, char* argv[], char* envp[]){
     } // while end
     free(str);
     free(ps1Prompt);
+    return 0;
 } // main end

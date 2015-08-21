@@ -6,6 +6,7 @@ char* strncpy(char *destinationString,const char *sourceString,int n){
         *destinationString = *sourceString;
         sourceString++;
         destinationString++;
+        count++;
     }
     *destinationString='\0';
     return destinationString;

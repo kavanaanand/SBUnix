@@ -24,4 +24,12 @@ struct posix_header_ustar {
 	char pad[12];
 };
 
+#define FILE_CONTENT_SIZE 512
+
+// uint64_t alignFileUp(uint64_t size);
+void printFiles();
+void * getFile(char * );
+void setupHeirarchyOfTarfs(); 
+struct tar_file* lookUpForFile(const char *filePath);
+
 #endif
